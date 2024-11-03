@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: load-SchemaDetailsLock
+      author: ajithkumar.s
+      changes:
+        - loadData:
+            tableName: SchemaDetailsLock
+            primaryKey: lockName
+            usePreparedStatements: true
+            file: db/changelog/configdb/data/schema-details-lock-1.csv
+            columns:
+              - column:
+                  name: lockName
+                  type: varchar(100)

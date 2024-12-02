@@ -1,12 +1,10 @@
 package com.apis.hive.controller
 
 import com.apis.hive.dto.DataDTO
-import com.apis.hive.entity.Data
 import com.apis.hive.exception.KeyNotFoundException
 import com.apis.hive.service.KeyValueDataService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
@@ -27,7 +25,7 @@ class HiveWebController {
     private lateinit var keyValueDataService: KeyValueDataService
 
     @GetMapping("/object/{key}")
-    fun getKey(@PathVariable key: String): ResponseEntity<Data> {
+    fun getKey(@PathVariable key: String): ResponseEntity<DataDTO> {
         return try {
             val result = keyValueDataService.findDataByKey(key)
             if (result != null) {
@@ -35,7 +33,7 @@ class HiveWebController {
                     this.key = result.id?.key!!
                     this.value = result.value
                 }
-                ResponseEntity(result, HttpStatusCode.valueOf(200))
+                ResponseEntity(resultDTO, HttpStatusCode.valueOf(200))
             } else throw KeyNotFoundException("key not found $key")
         } catch (ex: Exception) {
             logger.info("Exception while processing getKey for key $key", ex)
@@ -45,34 +43,19 @@ class HiveWebController {
 
     @PostMapping("/object")
     fun putKey(@RequestBody body: Map<String, Any?>): ResponseEntity<Any?> {
-        return try {
-            keyValueDataService.bulkSaveData(listOf(body))
-            ResponseEntity.ok().build()
-        } catch (ex: Exception) {
-            logger.info("Exception while processing saving key", ex)
-            throw ex
-        }
+        keyValueDataService.bulkSaveData(listOf(body))
+        return ResponseEntity.ok().build()
     }
 
     @PostMapping("/batch/object")
     fun putKeys(@RequestBody body: List<Map<String, Any?>>): ResponseEntity<Any?> {
-        try {
-            keyValueDataService.bulkSaveData(body)
-        } catch (ex: Exception) {
-            logger.info("Exception while processing saving key ", ex)
-            throw ex
-        }
+        keyValueDataService.bulkSaveData(body)
         return ResponseEntity.ok().build()
     }
 
     @DeleteMapping("/object/{key}")
     fun deleteKey(@PathVariable key: String): ResponseEntity<Any?> {
-        return try {
-            keyValueDataService.deleteDataByKey(key)
-            ResponseEntity.ok().build()
-        } catch (ex: Exception) {
-            println("Exception while deleting key $key")
-            throw ex
-        }
+        keyValueDataService.deleteDataByKey(key)
+        return ResponseEntity.ok().build()
     }
 }

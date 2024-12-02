@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
+import java.util.regex.Pattern
 
 @Service
 class KeyValueDataService {
@@ -49,7 +50,7 @@ class KeyValueDataService {
             dataRepo.flush()
         } catch (ex: Exception) {
             logger.error("exception while saving data",ex)
-            if(AppConstant.DUPLICATE_KEY_REGEX.matches(ex.cause?.cause?.message?:"")) {
+            if(Pattern.compile(AppConstant.DUPLICATE_KEY_REGEX).matcher(ex.cause?.cause?.message ?: "").find()) {
                 throw KeyAlreadyExistsException("duplicate key found")
             } else throw ex
         }

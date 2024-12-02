@@ -22,5 +22,5 @@ class HiveWebApplication {
 }
 
 fun main(args: Array<String>) {
-    val test = runApplication<HiveWebApplication>(*args)
+    runApplication<HiveWebApplication>(*args)
 }

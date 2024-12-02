@@ -6,5 +6,3 @@ pluginManagement {
 }
 rootProject.name = "hive"
 include("hive-web")
-include("schema-manager")
-include("hive-utils")

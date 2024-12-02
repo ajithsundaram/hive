@@ -27,8 +27,15 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation("com.zaxxer:HikariCP")
-    implementation(project(":hive-utils"))
     implementation("javax.xml.bind:jaxb-api:2.3.1")
+    implementation("org.liquibase:liquibase-core")
+    implementation("io.jsonwebtoken:jjwt:0.9.1")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    testImplementation("org.springframework.security:spring-security-test")
+    implementation("org.slf4j:slf4j-api")
+    implementation("ch.qos.logback:logback-classic")
+
 }
 
 kotlin {

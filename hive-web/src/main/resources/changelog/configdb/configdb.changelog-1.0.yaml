@@ -1,0 +1,49 @@
+databaseChangeLog:
+  - changeSet:
+      id: CT-TenantDetails
+      author: ajithkumar.s
+      changes:
+        - createTable:
+            tableName: TenantDetails
+            columns:
+              - column:
+                  name: tenantId
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: storageSize
+                  type: bigint
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: CT-Data
+      author: ajithkumar.s
+      changes:
+        - createTable:
+            tableName: Data
+            columns:
+              - column:
+                  name: tenantId
+                  type: bigint
+              - column:
+                  name: key
+                  type: varchar(40)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: value
+                  type: json
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ttl
+                  type: bigint
+        - addPrimaryKey:
+            constraintName: tenant_key_pk
+            columnNames: tenantId, key
+            tableName: Data
+        - modifySql:
+            dbms: mysql
+            append:
+              value: "PARTITION BY KEY(tenantId, `key`) PARTITIONS 10;"

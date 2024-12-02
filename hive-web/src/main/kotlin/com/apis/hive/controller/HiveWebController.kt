@@ -1,12 +1,12 @@
 package com.apis.hive.controller
 
-import com.apis.hive.dto.KeyValueData
+import com.apis.hive.entity.Data
 import com.apis.hive.exception.HiveException
 import com.apis.hive.service.KeyValueDataService
-import com.apis.hive.util.APIConstant
 import com.apis.hive.util.ErrorConstants
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
@@ -27,14 +27,18 @@ class HiveWebController {
     private lateinit var keyValueDataService: KeyValueDataService
 
     @GetMapping("/object/{key}")
-    fun getKey(@PathVariable key: String): ResponseEntity<KeyValueData> {
+    fun getKey(@PathVariable key: String): ResponseEntity<Data> {
         return try {
             val result = keyValueDataService.findDataByKey(key)
             if (result != null) {
-                val response = KeyValueData()
-                response.key = key
-                response.value = result.value
-                ResponseEntity(response, null, HttpStatusCode.valueOf(200))
+                val headers = HttpHeaders()
+                if(result.ttl != null) {
+                    headers.apply {
+                        val validityTimeInSec = result.ttl!! - System.currentTimeMillis()
+                        set("Cache-Control", "max-age=$validityTimeInSec")
+                    }
+                }
+                ResponseEntity(result, headers, HttpStatusCode.valueOf(200))
             } else throw HiveException(ErrorConstants.KEY_NOT_EXIST)
         } catch (ex: Exception) {
             logger.info("Exception while processing getKey for key $key", ex)
@@ -48,7 +52,7 @@ class HiveWebController {
             keyValueDataService.bulkSaveData(listOf(body))
             ResponseEntity.ok().build()
         } catch (ex: Exception) {
-            logger.info("Exception while processing saving key ${body[APIConstant.KEY]}", ex)
+            logger.info("Exception while processing saving key", ex)
             throw ex
         }
     }

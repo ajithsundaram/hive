@@ -1,7 +1,7 @@
 package com.apis.hive.service
 
 import com.apis.hive.entity.TenantDetails
-import com.apis.hive.exception.HiveException
+import com.apis.hive.exception.ServerErrorException
 import com.apis.hive.repository.TenantDetailsRepo
 import com.apis.hive.util.AppConstant
 import com.apis.hive.util.ErrorConstants
@@ -36,7 +36,7 @@ class TenantService {
     }
 
     fun validateAndGetToken(tenantId: Long): Map<String, Any?>? {
-        tenantDetailsRepo.findById(tenantId).orElseThrow { HiveException(ErrorConstants.INVALID_TENANT) }
+        tenantDetailsRepo.findById(tenantId).orElseThrow { ServerErrorException(ErrorConstants.INVALID_TENANT.message + tenantId) }
         return generateToken(tenantId)
     }
 

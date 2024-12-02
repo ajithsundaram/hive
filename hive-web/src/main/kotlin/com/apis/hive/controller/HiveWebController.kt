@@ -1,9 +1,9 @@
 package com.apis.hive.controller
 
+import com.apis.hive.dto.DataDTO
 import com.apis.hive.entity.Data
-import com.apis.hive.exception.HiveException
+import com.apis.hive.exception.KeyNotFoundException
 import com.apis.hive.service.KeyValueDataService
-import com.apis.hive.util.ErrorConstants
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
@@ -31,15 +31,12 @@ class HiveWebController {
         return try {
             val result = keyValueDataService.findDataByKey(key)
             if (result != null) {
-                val headers = HttpHeaders()
-                if(result.ttl != null) {
-                    headers.apply {
-                        val validityTimeInSec = result.ttl!! - System.currentTimeMillis()
-                        set("Cache-Control", "max-age=$validityTimeInSec")
-                    }
+                val resultDTO = DataDTO().apply {
+                    this.key = result.id?.key!!
+                    this.value = result.value
                 }
-                ResponseEntity(result, headers, HttpStatusCode.valueOf(200))
-            } else throw HiveException(ErrorConstants.KEY_NOT_EXIST)
+                ResponseEntity(result, HttpStatusCode.valueOf(200))
+            } else throw KeyNotFoundException("key not found $key")
         } catch (ex: Exception) {
             logger.info("Exception while processing getKey for key $key", ex)
             throw ex

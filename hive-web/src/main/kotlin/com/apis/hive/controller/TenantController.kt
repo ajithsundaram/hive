@@ -1,6 +1,6 @@
 package com.apis.hive.controller
 
-import com.apis.hive.exception.HiveException
+import com.apis.hive.exception.ServerErrorException
 import com.apis.hive.service.TenantService
 import com.apis.hive.util.AppConstant
 import com.apis.hive.util.ErrorConstants
@@ -26,7 +26,7 @@ class TenantController {
 
     @PostMapping("/login")
     fun loginTenant(@RequestBody body: Map<String, Any?>): ResponseEntity<Any?> {
-        val tenantId = body[AppConstant.TENANT_ID]?.toString()?.toLong() ?: throw HiveException(ErrorConstants.INVALID_INPUT)
+        val tenantId = body[AppConstant.TENANT_ID]?.toString()?.toLong() ?: throw ServerErrorException(ErrorConstants.INVALID_INPUT.message)
         val responseMap = tenantService.validateAndGetToken(tenantId)
         return ResponseEntity.ok().body(responseMap)
     }

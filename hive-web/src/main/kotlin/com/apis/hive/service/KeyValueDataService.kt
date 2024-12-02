@@ -1,18 +1,18 @@
 package com.apis.hive.service
 
-import com.apis.hive.configuration.TenantAuthenticationToken
 import com.apis.hive.dto.DataDTO
 import com.apis.hive.entity.Data
 import com.apis.hive.entity.TenantKey
-import com.apis.hive.exception.HiveException
+import com.apis.hive.exception.KeyAlreadyExistsException
+import com.apis.hive.exception.KeyNotFoundException
+import com.apis.hive.exception.StorageLimitExceededException
 import com.apis.hive.repository.DataRepo
 import com.apis.hive.repository.TenantDetailsRepo
-import com.apis.hive.util.ErrorConstants
+import com.apis.hive.util.AppConstant
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.dao.DuplicateKeyException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
@@ -30,7 +30,7 @@ class KeyValueDataService {
 
     fun findDataByKey(key: String): Data? {
         val tenantId = getTenantId()
-        return dataRepo.findByTenantIdAndKey(tenantId, key) ?: throw HiveException(ErrorConstants.KEY_NOT_EXIST)
+        return dataRepo.findByTenantIdAndKey(tenantId, key) ?: throw KeyNotFoundException("$key not found")
     }
 
     fun bulkSaveData(inputData: List<Map<String, Any?>>) {
@@ -49,8 +49,8 @@ class KeyValueDataService {
             dataRepo.flush()
         } catch (ex: Exception) {
             logger.error("exception while saving data",ex)
-            if (ex is DuplicateKeyException) {
-                throw HiveException(ErrorConstants.KEY_ALREADY_EXIST)
+            if(AppConstant.DUPLICATE_KEY_REGEX.matches(ex.cause?.cause?.message?:"")) {
+                throw KeyAlreadyExistsException("duplicate key found")
             } else throw ex
         }
     }
@@ -61,7 +61,7 @@ class KeyValueDataService {
             val tenantId = tenantService.getTenantId()
             dataRepo.deleteById(TenantKey(tenantId,key))
         } else {
-            throw HiveException(ErrorConstants.KEY_NOT_EXIST)
+            throw KeyNotFoundException(key)
         }
     }
 
@@ -70,8 +70,8 @@ class KeyValueDataService {
             val tenantId = getTenantId()
             val tenantLimit = tenantDetailsRepo.findById(tenantId).get().storageSize!!
             val existingCount = dataRepo.getValidKeyCount(tenantId)
-            if( tenantLimit < existingCount+currentAdditionCount ){
-                throw HiveException(ErrorConstants.DATA_LIMIT_EXCEEDED_FOR_TENANT)
+            if ( tenantLimit < existingCount+currentAdditionCount ) {
+                throw StorageLimitExceededException("existing count $existingCount current addition $currentAdditionCount")
             }
         } catch (ex: Exception){
             logger.error("Exception while checking tenant data limit",ex)

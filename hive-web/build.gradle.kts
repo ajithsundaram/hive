@@ -35,6 +35,7 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
     implementation("org.slf4j:slf4j-api")
     implementation("ch.qos.logback:logback-classic")
+    implementation("org.quartz-scheduler:quartz:2.5.0")
 
 }
 

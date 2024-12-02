@@ -17,7 +17,6 @@ interface DataRepo: JpaRepository<Data,TenantKey> {
     @Query("select count(data) from Data data where data.id.tenantId = :tenantId and (data.ttl > :currentTimeInMilies or data.ttl is null)")
     fun getValidKeyCount(tenantId:Long, currentTimeInMilies:Long = System.currentTimeMillis()):Int
 
-
     @Modifying
     @Transactional
     @Query("delete Data where ttl < :currentTimeInMilies")

@@ -6,7 +6,6 @@ import org.quartz.Job
 import org.quartz.JobBuilder
 import org.quartz.JobExecutionContext
 import org.quartz.SimpleScheduleBuilder
-import org.quartz.Trigger
 import org.quartz.TriggerBuilder
 import org.quartz.impl.StdSchedulerFactory
 import org.slf4j.LoggerFactory
@@ -19,7 +18,7 @@ class DataCleanUpService( @Value("\${app.hive.cleanup.intervalInMins}")
         val jobDetail = JobBuilder.newJob(CleanUpJob::class.java)
             .withIdentity("cleanupJob", "group1")
             .build()
-        val trigger: Trigger = TriggerBuilder.newTrigger()
+        val trigger = TriggerBuilder.newTrigger()
             .withIdentity("cleanupTrigger", "group1")
             .startNow()
             .withSchedule(

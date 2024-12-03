@@ -34,6 +34,8 @@ configure(allprojects) {
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
         implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
         implementation("net.mguenther.idem:idem-core:0.1.0")
+        testImplementation("org.mockito:mockito-core:3.12.4")
+        testImplementation("org.mockito:mockito-inline:3.12.4")
     }
 }
 

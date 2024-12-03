@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 
 @Service
 class TenantService {
@@ -24,25 +23,24 @@ class TenantService {
     @Autowired
     private lateinit var jwtUtil: JwtUtil
 
-    @Transactional
-    fun createTenant(input: Map<String,Any?>): Map<String, Any?>? {
+    fun createTenant(input: Map<String,String?>): Map<String, String?>? {
         val tenantId = idGen.nextId()
         val tenantDetails = TenantDetails().apply {
             this.tenantId = tenantId
-            this.storageSize = input[AppConstant.STORAGE_SIZE]?.toString()?.toInt() ?: tenantDefaultStorageLimit!!.toInt()
+            this.storageSize = input[AppConstant.STORAGE_SIZE]?.toInt() ?: tenantDefaultStorageLimit!!.toInt()
             }
             tenantDetailsRepo.saveAndFlush(tenantDetails)
             return generateToken(tenantId)
     }
 
-    fun validateAndGetToken(tenantId: Long): Map<String, Any?>? {
+    fun validateAndGetToken(tenantId: Long): Map<String, String?>? {
         tenantDetailsRepo.findById(tenantId).orElseThrow { ServerErrorException(ErrorConstants.INVALID_TENANT.message + tenantId) }
         return generateToken(tenantId)
     }
 
-    private fun generateToken(tenantId: Long): Map<String, Any?>  {
+    private fun generateToken(tenantId: Long): Map<String, String?>  {
         val jwtToken = jwtUtil.generateToken(tenantId)
-        return mapOf(AppConstant.TENANT_ID to tenantId , AppConstant.TOKEN to jwtToken)
+        return mapOf(AppConstant.TENANT_ID to tenantId.toString() , AppConstant.TOKEN to jwtToken)
     }
 
     fun getTenantId(): Long {

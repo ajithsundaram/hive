@@ -19,13 +19,13 @@ class TenantController {
     @Autowired
     private lateinit var tenantService: TenantService
     @PostMapping("/create")
-    fun createTenant(@RequestBody body: Map<String, Any?>): ResponseEntity<Any?> {
+    fun createTenant(@RequestBody body: Map<String, String?>): ResponseEntity<Map<String,String?>?> {
         val responseMap = tenantService.createTenant(body)
         return ResponseEntity.ok().body(responseMap)
     }
 
     @PostMapping("/login")
-    fun loginTenant(@RequestBody body: Map<String, Any?>): ResponseEntity<Any?> {
+    fun loginTenant(@RequestBody body: Map<String, Any?>): ResponseEntity<Map<String,String?>?> {
         val tenantId = body[AppConstant.TENANT_ID]?.toString()?.toLong() ?: throw ServerErrorException(ErrorConstants.INVALID_INPUT.message)
         val responseMap = tenantService.validateAndGetToken(tenantId)
         return ResponseEntity.ok().body(responseMap)

@@ -6,9 +6,13 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "TenantDetails",schema = "hive")
-class TenantDetails: AbstractEntity<Long>() {
+class TenantDetails(): AbstractEntity<Long>() {
     @Id
     var tenantId : Long? = null
     var storageSize: Int? = null
     override fun getPK() = tenantId
+    constructor(tenantId: Long?,storageSize: Int?) : this() {
+        this.tenantId = tenantId
+        this.storageSize = storageSize
+    }
 }

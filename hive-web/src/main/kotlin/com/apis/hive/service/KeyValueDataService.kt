@@ -13,8 +13,6 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import java.util.regex.Pattern
 
@@ -30,7 +28,7 @@ class KeyValueDataService {
     private var logger = LoggerFactory.getLogger(this::class.java)
 
     fun findDataByKey(key: String): Data? {
-        val tenantId = getTenantId()
+        val tenantId = tenantService.getTenantId()
         return dataRepo.findByTenantIdAndKey(tenantId, key) ?: throw KeyNotFoundException("$key not found")
     }
 
@@ -66,9 +64,9 @@ class KeyValueDataService {
         }
     }
 
-    private fun validateTenantLimit(currentAdditionCount:Int) {
+    fun validateTenantLimit(currentAdditionCount:Int) {
         try {
-            val tenantId = getTenantId()
+            val tenantId = tenantService.getTenantId()
             val tenantLimit = tenantDetailsRepo.findById(tenantId).get().storageSize!!
             val existingCount = dataRepo.getValidKeyCount(tenantId)
             if ( tenantLimit < existingCount+currentAdditionCount ) {
@@ -79,10 +77,4 @@ class KeyValueDataService {
             throw ex
         }
     }
-
-    private fun getTenantId(): Long {
-        val tenantAuth = SecurityContextHolder.getContext().authentication as UsernamePasswordAuthenticationToken
-        return tenantAuth.principal as Long
-    }
-
 }

@@ -26,13 +26,15 @@ databaseChangeLog:
               - column:
                   name: tenantId
                   type: bigint
+                  constraints:
+                    nullable: false
               - column:
-                  name: key
+                  name: dataKey
                   type: varchar(40)
                   constraints:
                     nullable: false
               - column:
-                  name: value
+                  name: dataValue
                   type: json
                   constraints:
                     nullable: false
@@ -40,10 +42,10 @@ databaseChangeLog:
                   name: ttl
                   type: bigint
         - addPrimaryKey:
-            constraintName: tenant_key_pk
-            columnNames: tenantId, key
+            constraintName: tenant_dataKey_pk
+            columnNames: tenantId, dataKey
             tableName: Data
         - modifySql:
             dbms: mysql
             append:
-              value: "PARTITION BY KEY(tenantId, `key`) PARTITIONS 10;"
+              value: "PARTITION BY KEY(tenantId, dataKey) PARTITIONS 10;"

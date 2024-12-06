@@ -39,8 +39,8 @@ class KeyValueDataService {
             val data = objectMapper.convertValue(inputData, object : TypeReference<List<DataDTO>>() {}).map { dataDto ->
                 dataDto.ttl = if( dataDto.ttl != null) System.currentTimeMillis() + (dataDto.ttl!! * 1000) else null
                 Data().apply {
-                    id = TenantKey(tenantId, dataDto.key)
-                    value = dataDto.value
+                    id = TenantKey(tenantId, dataDto.dataKey)
+                    dataValue = dataDto.dataValue
                     ttl = dataDto.ttl
                 }
             }

@@ -11,6 +11,8 @@ import org.quartz.impl.StdSchedulerFactory
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import java.util.*
+
 @Service
 class DataCleanUpService( @Value("\${app.hive.cleanup.intervalInMins}")
                           private val cleanupIntervalInMins: String) {
@@ -19,8 +21,7 @@ class DataCleanUpService( @Value("\${app.hive.cleanup.intervalInMins}")
             .withIdentity("cleanupJob", "group1")
             .build()
         val trigger = TriggerBuilder.newTrigger()
-            .withIdentity("cleanupTrigger", "group1")
-            .startNow()
+            .withIdentity("cleanupTrigger", "group1").startAt(Date(System.currentTimeMillis() + (180 * 1000) ))
             .withSchedule(
                 SimpleScheduleBuilder.simpleSchedule()
                     .withIntervalInMinutes(cleanupIntervalInMins.toInt())

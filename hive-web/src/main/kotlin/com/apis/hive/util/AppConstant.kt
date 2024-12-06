@@ -13,5 +13,8 @@ object AppConstant {
     const val LOGIN_TENANT_ENDPOINT = "/tenant/login"
     val PUBLIC_ENDPOINTS = setOf(CREATE_TENANT_ENDPOINT, LOGIN_TENANT_ENDPOINT)
     val DUPLICATE_KEY_REGEX = "Duplicate entry '.*?-(.*?)' for key 'data.PRIMARY'"
+
+    const val DATA_KEY = "dataKey"
+    const val DATA_VALUE = "dataValue"
 }
 

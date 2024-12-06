@@ -30,8 +30,8 @@ class HiveWebController {
             val result = keyValueDataService.findDataByKey(key)
             if (result != null) {
                 val resultDTO = DataDTO().apply {
-                    this.key = result.id?.key!!
-                    this.value = result.value
+                    this.dataKey = result.id?.dataKey!!
+                    this.dataValue = result.dataValue
                 }
                 ResponseEntity(resultDTO, HttpStatusCode.valueOf(200))
             } else throw KeyNotFoundException("key not found $key")

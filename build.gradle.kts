@@ -36,6 +36,7 @@ configure(allprojects) {
         implementation("net.mguenther.idem:idem-core:0.1.0")
         testImplementation("org.mockito:mockito-core:3.12.4")
         testImplementation("org.mockito:mockito-inline:3.12.4")
+        runtimeOnly ("com.h2database:h2")
     }
 }
 

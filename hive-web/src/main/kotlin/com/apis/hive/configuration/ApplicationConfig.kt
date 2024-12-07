@@ -48,11 +48,4 @@ class ApplicationConfig {
         return LiquibaseProperties()
     }
 
-    @Bean
-    fun restTemplate(): RestTemplate? {
-        return RestTemplate()
-    }
-
-
-
 }

@@ -97,7 +97,7 @@ class KeyValueServiceTests(
         setTenantScopeForTestSuite(testTenantId1!!)
         val inputData = listOf(
             mapOf(AppConstant.DATA_KEY to "key1", AppConstant.DATA_VALUE to mockValue, "ttl" to null),
-            mapOf(AppConstant.DATA_KEY to "key2", "dataValue" to mockValue, "ttl" to 10)
+            mapOf(AppConstant.DATA_KEY to "key2", AppConstant.DATA_VALUE to mockValue, "ttl" to 10)
         )
         keyValueDataService.bulkSaveData(inputData)
         val result1 = keyValueDataService.findDataByKey("key1")
@@ -188,7 +188,7 @@ class KeyValueServiceTests(
             mapOf(AppConstant.DATA_KEY to "ttl_5_key", AppConstant.DATA_VALUE to mockValue, "ttl" to 5)
         )
         keyValueDataService.bulkSaveData(inputData)
-        Thread.sleep(6 * 1000)
+        Thread.sleep(7 * 1000)
         assertThrows<KeyNotFoundException> {
             keyValueDataService.findDataByKey("ttl_5_key")
         }

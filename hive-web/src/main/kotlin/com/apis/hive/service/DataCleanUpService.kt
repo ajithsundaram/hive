@@ -21,7 +21,7 @@ class DataCleanUpService( @Value("\${app.hive.cleanup.intervalInMins}")
             .withIdentity("cleanupJob", "group1")
             .build()
         val trigger = TriggerBuilder.newTrigger()
-            .withIdentity("cleanupTrigger", "group1").startAt(Date(System.currentTimeMillis() + (180 * 1000) ))
+            .withIdentity("cleanupTrigger", "group1").startNow()
             .withSchedule(
                 SimpleScheduleBuilder.simpleSchedule()
                     .withIntervalInMinutes(cleanupIntervalInMins.toInt())

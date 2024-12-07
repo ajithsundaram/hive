@@ -188,7 +188,7 @@ class KeyValueServiceTests(
             mapOf(AppConstant.DATA_KEY to "ttl_5_key", AppConstant.DATA_VALUE to mockValue, "ttl" to 5)
         )
         keyValueDataService.bulkSaveData(inputData)
-        Thread.sleep(7 * 1000)
+        Thread.sleep(6 * 1000)
         assertThrows<KeyNotFoundException> {
             keyValueDataService.findDataByKey("ttl_5_key")
         }

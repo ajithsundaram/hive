@@ -19,12 +19,6 @@ import org.springframework.transaction.PlatformTransactionManager
 import javax.sql.DataSource
 
 @Configuration
-//@EnableJpaRepositories(
-//    basePackages = ["com.apis.hive"],
-//    entityManagerFactoryRef = "hiveEntityManagerFactory",
-//    transactionManagerRef = "hiveTransaction",
-//    bootstrapMode = BootstrapMode.DEFAULT
-//)
 class DataSourceConfig {
     @Value("\${app.datasource.hive.url}")
     private val url: String? = null
@@ -41,38 +35,6 @@ class DataSourceConfig {
         dataSource.password = password
         return dataSource
     }
-
-//    @Bean
-//    @Primary
-//    fun jpaVendorAdapter(): JpaVendorAdapter {
-//        val adapter = HibernateJpaVendorAdapter()
-//        adapter.setGenerateDdl(true)
-//        adapter.setDatabasePlatform("org.hibernate.dialect.MySQLDialect")
-//        return adapter
-//    }
-//
-//    @Bean
-//    @Primary
-//    @Qualifier("hiveEntityManagerFactory")
-//    fun hiveEntityManagerFactory(@Autowired dataSource: DataSource, jpaVendorAdapter: JpaVendorAdapter): LocalContainerEntityManagerFactoryBean {
-//        val emf = LocalContainerEntityManagerFactoryBean()
-//        emf.setJtaDataSource(dataSource)
-//        emf.dataSource = dataSource
-//        emf.jpaVendorAdapter = jpaVendorAdapter
-//        emf.setPackagesToScan("com.apis.hive")
-//        return emf
-//    }
-//
-//
-//    @Bean
-//    @Qualifier("hiveTransaction")
-//    @Primary
-//    fun hiveTransaction(
-//         @Qualifier("hiveEntityManagerFactory")
-//         entityManagerFactory: LocalContainerEntityManagerFactoryBean
-//    ): PlatformTransactionManager {
-//        return JpaTransactionManager(entityManagerFactory.getObject()!!)
-//    }
 
 }
 

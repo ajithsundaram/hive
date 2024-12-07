@@ -1,14 +1,10 @@
 package com.apis.hive
 
 import com.apis.hive.entity.Data
-import com.apis.hive.entity.TenantDetails
 import com.apis.hive.entity.TenantKey
-import com.apis.hive.exception.KeyAlreadyExistsException
 import com.apis.hive.exception.KeyNotFoundException
 import com.apis.hive.exception.StorageLimitExceededException
 import com.apis.hive.migrationHandler.SchemaMigrationHandler
-import com.apis.hive.repository.DataRepo
-import com.apis.hive.repository.TenantDetailsRepo
 import com.apis.hive.service.KeyValueDataService
 import com.apis.hive.service.TenantService
 import com.apis.hive.util.AppConstant
@@ -21,22 +17,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestMethodOrder
 import org.junit.jupiter.api.assertThrows
-import org.mockito.ArgumentMatchers
-import org.mockito.InjectMocks
-import org.mockito.Mock
-import org.mockito.Mockito
-import org.mockito.Mockito.anyLong
-import org.mockito.Mockito.anyString
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
-import org.mockito.MockitoAnnotations
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.stereotype.Component
-import org.springframework.test.context.TestExecutionListeners
 import java.util.*
 
 @SpringBootTest
@@ -70,7 +55,7 @@ class KeyValueServiceTests(
     fun `findDataByKey should return data when key exists`() {
         setTenantScopeForTestSuite(testTenantId1!!)
         val key = "testKey"
-        val keyValueDataInputMap = mutableMapOf(AppConstant.DATA_KEY to key, AppConstant.DATA_VALUE to mockValue as Any?)
+        val keyValueDataInputMap = mutableMapOf(AppConstant.KEY to key, AppConstant.VALUE to mockValue as Any?)
         val data = Data(TenantKey(testTenantId1, key), mockValue.toMutableMap(), null)
 
         keyValueDataService.bulkSaveData(listOf(keyValueDataInputMap))
@@ -96,8 +81,8 @@ class KeyValueServiceTests(
     fun `bulkSaveData should save all data when input is valid`() {
         setTenantScopeForTestSuite(testTenantId1!!)
         val inputData = listOf(
-            mapOf(AppConstant.DATA_KEY to "key1", AppConstant.DATA_VALUE to mockValue, "ttl" to null),
-            mapOf(AppConstant.DATA_KEY to "key2", AppConstant.DATA_VALUE to mockValue, "ttl" to 10)
+            mapOf(AppConstant.KEY to "key1", AppConstant.VALUE to mockValue, "ttl" to null),
+            mapOf(AppConstant.KEY to "key2", AppConstant.VALUE to mockValue, "ttl" to 10)
         )
         keyValueDataService.bulkSaveData(inputData)
         val result1 = keyValueDataService.findDataByKey("key1")
@@ -115,7 +100,7 @@ class KeyValueServiceTests(
     fun `bulkSaveData should throw KeyAlreadyExistsException on duplicate recordKey`() {
         setTenantScopeForTestSuite(testTenantId1!!)
         val inputData = listOf(
-            mapOf(AppConstant.DATA_KEY to "uniqueKey1", AppConstant.DATA_VALUE to mockValue, "ttl" to null)
+            mapOf(AppConstant.KEY to "uniqueKey1", AppConstant.VALUE to mockValue, "ttl" to null)
         )
         keyValueDataService.bulkSaveData(inputData)
         val exception = assertThrows<DataIntegrityViolationException> {
@@ -129,7 +114,7 @@ class KeyValueServiceTests(
     fun `deleteDataByKey should delete data when key exists`() {
         setTenantScopeForTestSuite(testTenantId1!!)
         val inputData = listOf(
-            mapOf(AppConstant.DATA_KEY to "keyNeedsToBeDeleted", AppConstant.DATA_VALUE to mockValue, "ttl" to null)
+            mapOf(AppConstant.KEY to "keyNeedsToBeDeleted", AppConstant.VALUE to mockValue, "ttl" to null)
         )
         keyValueDataService.bulkSaveData(inputData)
         keyValueDataService.deleteDataByKey("keyNeedsToBeDeleted")
@@ -143,19 +128,19 @@ class KeyValueServiceTests(
     fun `validateTenantLimit should throw StorageLimitExceededException when tenant exceeds limit`() {
         setTenantScopeForTestSuite(testTenantId2!!)
         var inputData = listOf(
-            mapOf(AppConstant.DATA_KEY to "key1", AppConstant.DATA_VALUE to mockValue, "ttl" to null),
-            mapOf(AppConstant.DATA_KEY to "key2", AppConstant.DATA_VALUE to mockValue, "ttl" to 10)
+            mapOf(AppConstant.KEY to "key1", AppConstant.VALUE to mockValue, "ttl" to null),
+            mapOf(AppConstant.KEY to "key2", AppConstant.VALUE to mockValue, "ttl" to 10)
         )
         keyValueDataService.bulkSaveData(inputData)
         inputData = listOf(
-            mapOf(AppConstant.DATA_KEY to "key3", AppConstant.DATA_VALUE to mockValue, "ttl" to null)
+            mapOf(AppConstant.KEY to "key3", AppConstant.VALUE to mockValue, "ttl" to null)
         )
         assertThrows<StorageLimitExceededException> {
             keyValueDataService.bulkSaveData(inputData)
         }
         inputData = listOf(
-            mapOf(AppConstant.DATA_KEY to "key4", AppConstant.DATA_VALUE to mockValue, "ttl" to null),
-            mapOf(AppConstant.DATA_KEY to "key5", AppConstant.DATA_VALUE to mockValue, "ttl" to null)
+            mapOf(AppConstant.KEY to "key4", AppConstant.VALUE to mockValue, "ttl" to null),
+            mapOf(AppConstant.KEY to "key5", AppConstant.VALUE to mockValue, "ttl" to null)
         )
         assertThrows<StorageLimitExceededException> {
             keyValueDataService.bulkSaveData(inputData)
@@ -167,8 +152,8 @@ class KeyValueServiceTests(
     fun `check one Tenant's data not accessible in another Tenant`() {
         setTenantScopeForTestSuite(testTenantId1!!)
         val inputData = listOf(
-            mapOf(AppConstant.DATA_KEY to "Tenant1_key_1", AppConstant.DATA_VALUE to mockValue, "ttl" to null),
-            mapOf(AppConstant.DATA_KEY to "Tenant1_key_2", AppConstant.DATA_VALUE to mockValue, "ttl" to 10)
+            mapOf(AppConstant.KEY to "Tenant1_key_1", AppConstant.VALUE to mockValue, "ttl" to null),
+            mapOf(AppConstant.KEY to "Tenant1_key_2", AppConstant.VALUE to mockValue, "ttl" to 10)
         )
         keyValueDataService.bulkSaveData(inputData)
         setTenantScopeForTestSuite(testTenantId2!!)
@@ -184,8 +169,8 @@ class KeyValueServiceTests(
     fun `test ttl null keys can be accessed for life Time`() {
         setTenantScopeForTestSuite(testTenantId1!!)
         val inputData = listOf(
-            mapOf(AppConstant.DATA_KEY to "ttl_null_key", AppConstant.DATA_VALUE to mockValue, "ttl" to null),
-            mapOf(AppConstant.DATA_KEY to "ttl_5_key", AppConstant.DATA_VALUE to mockValue, "ttl" to 5)
+            mapOf(AppConstant.KEY to "ttl_null_key", AppConstant.VALUE to mockValue, "ttl" to null),
+            mapOf(AppConstant.KEY to "ttl_5_key", AppConstant.VALUE to mockValue, "ttl" to 5)
         )
         keyValueDataService.bulkSaveData(inputData)
         Thread.sleep(6 * 1000)

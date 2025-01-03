@@ -48,4 +48,4 @@ databaseChangeLog:
         - modifySql:
             dbms: mysql
             append:
-              value: "PARTITION BY KEY(tenantId, dataKey) PARTITIONS 10;"
+              value: "PARTITION BY KEY(tenantId) PARTITIONS 10;"
